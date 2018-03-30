@@ -7,15 +7,30 @@
 //
 
 #import "ViewController.h"
+#import <CoreMotion/CoreMotion.h>
 
 @interface ViewController ()<CLLocationManagerDelegate>
-
+{
+    NSTimer *_timer;
+    
+}
+@property (nonatomic, strong) CMMotionManager * motionManager;
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0/60.0 target:self selector:@selector(autoChange) userInfo:nil repeats:YES];
+    //  [[NSRunLoop currentRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
+   _motionManager = [[CMMotionManager alloc]init];
+    
+    _motionManager.accelerometerUpdateInterval=1.0/60.0;
+    
+    [ _motionManager startAccelerometerUpdates];
+    
+    
     _manager = [[CLLocationManager alloc]init];
     _manager.distanceFilter = kCLDistanceFilterNone;
     _manager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -36,6 +51,23 @@
     // Do any additional setup after loading the view, typically from a nib.
 }
 
+
+-(void)autoChange
+
+{
+    
+    //根据自己需求调节x y z
+    
+    if (fabs(_motionManager.accelerometerData.acceleration.x) > 2.0 || fabs(_motionManager.accelerometerData.acceleration.y) > 2.2 || fabs(_motionManager.accelerometerData.acceleration.z) > 1.5)
+        
+    {
+        
+        NSLog(@"我晃动了 。。。。。");
+        
+    }
+    
+}
+
 //定位失败时调用的方法
 -(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
@@ -52,7 +84,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager
        didUpdateHeading:(CLHeading *)newHeading {
-    NSLog(@"didUpdateHeading");
+    //NSLog(@"didUpdateHeading");
 }
 
 
